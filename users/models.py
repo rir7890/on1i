@@ -11,5 +11,5 @@ class app_user_mst(models.Model):
     join_date = models.DateField(auto_now_add=True)
     is_active = models.BooleanField(default=False)
 
-    def __init__(self):
+    def __str__(self):
         return f'{self.user_name}'
