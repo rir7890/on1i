@@ -1,0 +1,38 @@
+/* *{
+    border: 1px solid white;
+} */
+body{
+    background-color: black;
+    color: aliceblue;
+}
+img{
+    width: 250px;
+    height: 200px;
+}
+.home-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-link-contain{
+    width: 100%;
+    text-align: center;
+    padding: 10px 5px 5px 5px;
+    
+}
+
+a{
+    text-decoration: none;
+    border-radius: 5px;
+    background-color: rgb(72, 72, 239);
+    display: inline-block;
+    text-align: center;
+    height: 30px;
+    width: 150px;
+    padding: 15px 0 0 0;
+    color:white;
+}
+
+

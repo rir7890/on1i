@@ -1,0 +1,97 @@
+body{
+    background-color: black;
+}
+
+*{
+    color: white;
+}
+
+/* signin design html form */
+
+.logo-img{
+    width:200px;
+    height: 150px;
+}
+
+.signin-container{
+    margin-top: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.signin-button{
+    background-color:rgb(26, 72, 212) ;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;   
+}
+
+.signin-button:hover{
+    border: 2px solid white;
+}
+
+input{
+    margin: 5px;
+    font-size: large;
+    padding: 5px 5px 5px 10px;
+    border-radius: 5px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    overflow: hidden;
+}
+
+input:hover{
+    border: 4px solid rgb(95, 174, 227); 
+}
+
+.signin-button a{
+    text-decoration: none;
+}
+
+
+
+/* signup design css part start here */
+
+
+.signup-container{
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-button{
+    width: 100%;
+    /* border: 2px solid white; */
+    display: flex;
+    flex-direction: column;
+}
+
+.signup-button >*{
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
+    /* border: 2px solid red; */
+}
+.signup-button div {
+    width: 100%;
+    overflow: hidden;
+    /* background-color: red; */
+    /* border: 2px solid red; */
+}
+.signup-button div>button{
+    width: 100%;
+    padding: 5px;
+    background-color: rgb(17, 88, 154);
+    font-size: large;
+}
+
+.signup-button div>button:hover{
+    border:1px solid white;
+}
+
+
+/* home page html design from this point*/
