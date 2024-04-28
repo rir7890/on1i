@@ -5,10 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-    <title>On1i</title>
-    <style>
-      /* Add your CSS code here */
-    </style>
+    <title>On1i SignUp</title>
   </head>
   <body>
     <div class="signup-container">
@@ -17,12 +14,21 @@
         src="{% static 'images/logo.png' %}"
         alt="On1i Image"
       />
+      {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+      {% endif %}
       <form method="POST">
+        {% csrf_token %}
+
         <div class="input-field">
           <input
             type="text"
             id="firstname"
-            name="firstname"
+            name="f_name"
             placeholder="First Name"
             required
           />
@@ -31,7 +37,7 @@
           <input
             type="text"
             id="lastname"
-            name="lastname"
+            name="l_name"
             placeholder="Last Name"
             required
           />
@@ -41,7 +47,7 @@
             type="tel"
             id="mobile"
             name="mobile"
-            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
             placeholder="Mobile Number"
             required
           />
@@ -59,7 +65,7 @@
           <input
             type="text"
             id="username"
-            name="username"
+            name="user_name"
             placeholder="Username"
             required
           />
@@ -90,7 +96,7 @@
             >
           </span>
           <div>
-            <button class="button">Create an account</button>
+            <button class="btn-signup button">Create an account</button>
           </div>
         </div>
       </form>
