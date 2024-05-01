@@ -27,9 +27,14 @@ def SignUp(request):
             messages.error(request, 'Username is already taken')
             return redirect('signin')
 
-        newuser = app_user_mst(user_name=user_name, f_name=f_name,
-                               l_name=l_name, password=password, mobile=mobile, email=email)
-        newuser.save()
+        try:
+            newuser = app_user_mst(user_name=user_name, f_name=f_name,
+                                   l_name=l_name, password=password, mobile=mobile, email=email)
+            newuser.save()
+        except Exception as e:
+            print("error in saving new user: " + e.message)
+            messages.error(request, "Value Error in Registration Form")
+            return redirect('signup')
         messages.success(request, 'User created successfully')
         return redirect('signin')
     else:
@@ -45,9 +50,14 @@ def SignIn(request):
             messages.error(request, 'missing or Invalid username or password')
             return redirect('signin')
 
-        registered_user = app_user_mst.objects.get(user_name=user_name)
+        try:
+            registered_user = app_user_mst.objects.get(user_name=user_name)
+        except Exception as e:
+            print("error in saving new user: " + e.message)
+            messages.error(request, 'Error in the Server from the Backend.')
+            return redirect('signin')
 
-        if registered_user:
+        if registered_user and registered_user.password == password:
             messages.success(request, 'User Login Successfully')
             return redirect('home-page')
         else:
@@ -60,7 +70,8 @@ def SignIn(request):
 def Home(request):
     return render(request, 'users/home.html')
 
-
 # after user login this page will be showned
+
+
 def HomePage(request):
     return render(request, 'users/home_page.html')
