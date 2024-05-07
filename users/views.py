@@ -13,7 +13,6 @@ def SignUp(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirmPassword = request.POST.get('confirm-password')
-
         if not user_name or not f_name or not l_name or not mobile or not email or not password:
             messages.error(
                 request, 'Check all the data correctly don\'t enter empty values')
@@ -45,11 +44,9 @@ def SignIn(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-
         if not user_name or not password:
             messages.error(request, 'missing or Invalid username or password')
             return redirect('signin')
-
         try:
             registered_user = app_user_mst.objects.get(user_name=user_name)
         except Exception as e:
