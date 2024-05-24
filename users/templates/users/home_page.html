@@ -4,8 +4,102 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      form {
+        margin: 20px 0;
+      }
+      input[type="file"] {
+        display: block;
+        margin: 10px 0;
+      }
+      input[type="text"],
+      input[type="url"] {
+        display: block;
+        margin: 10px 0;
+        padding: 8px;
+        width: 300px;
+      }
+      button {
+        padding: 10px 15px;
+        background-color: #5cb85c;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #4cae4c;
+      }
+      .custom-text-field {
+        width: 400px;
+        height: 100px;
+        padding: 8px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Home Page</h1>
+    {% if user_name %}
+    <a href="{% url 'logout' %}">Logout</a>
+    {% endif %}
+
+    <h1>Upload Image</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <img
+        src="{{user_image}}"
+        style="width: 150px; height: 150px"
+        alt="userImage"
+      />
+      <br />
+      <label for="id_image">Image:</label>
+
+      <input type="file" name="image" id="id_image" />
+
+      <input type="text" name="user_name" id="" placeholder="{{user_name}}" />
+
+      <textarea
+        type="text"
+        name="description"
+        id=""
+        placeholder="{{description}}"
+        class="custom-text-field"
+      ></textarea>
+
+      <input type="text" name="mobile" id="" placeholder="{{mobile}}" />
+
+      <input type="text" name="email" id="" placeholder="{{email}}" />
+
+      <button type="submit" name="upload_profile">Update Profile</button>
+    </form>
+
+    <form method="post">
+      {% csrf_token %}
+      <label for="channel">Social Media Channel:</label>
+      <input
+        type="text"
+        name="channel"
+        id="channel"
+        required
+        placeholder="Add channel link.."
+      />
+
+      <label for="link">Link:</label>
+      <input
+        type="url"
+        name="link"
+        id="link"
+        required
+        placeholder="Add userlink after channel..."
+      />
+
+      <button type="submit" name="add_link">Add</button>
+    </form>
   </body>
 </html>
