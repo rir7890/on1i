@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
+from django.core.files.storage import default_storage
 from .models import app_user_mst, UserProfile, LinkProfile
 from django.contrib import messages
+from django.conf import settings
+
 # from django.contrib.auth import login
 
 
@@ -75,6 +78,8 @@ def HomePage(request):
     user_info = app_user_mst.objects.get(user_name=user_name)
     user_profile = UserProfile.objects.get(user_name=user_name)
 
+    # print(user_profile.image.url)
+
     if not user_info:
         messages.error(request, 'Username not found')
         return redirect('signin')
@@ -89,36 +94,55 @@ def HomePage(request):
     if request.method == 'POST':
 
         # uploading file logic
-        if 'upload-profile' in request.POST:
+        if 'upload_profile' in request.POST:
             user_profile_data = {
-                'image': request.FILES.get('image'),
-                'user_name': request.POST.get('username'),
-                'description': request.POST.get('description'),
-                'mobile': request.POST.get('mobile'),
-                'email': request.POST.get('email')
+                'image': request.FILES.get('image', user_profile.image),
+                'user_name': request.POST.get('username', user_name),
+                'description': request.POST.get('description', user_profile.description),
+                'mobile': request.POST.get('mobile', user_info.mobile),
+                'email': request.POST.get('email', user_info.email),
             }
 
             # check if the user is already exists or not
-            if app_user_mst.objects.filter(user_name=user_profile_data.user_name).exists():
-                messages.error(
-                    request, 'username already exists , please taken another username')
-                return redirect('home-page')
+            # if app_user_mst.objects.filter(user_name=user_profile_data['user_name']).exists():
+            #     messages.error(
+            #         request, 'username already exists , please taken another username')
+            #     return redirect('home-page')
 
-                # update the user profile data after updating the profile
-            updated_user = app_user_mst.objects.filter(
-                user_name=user_name).update(user_name=user_profile_data.user_name, mobile=user_profile_data.mobile, email=user_profile_data.email)
-            user_profile_update = UserProfile.objects.filter(
-                user_name=user_name).update(image=user_profile_data.image, description=user_profile_data.description)
-            user_link_profile = LinkProfile.objects.filter(
-                user_name=user_name).update(user_name=user_profile_data.user_name)
+            # update the user profile data after updating the profile
+            # print(user_profile_data['user_name'])
+            if user_profile_data['user_name'] or user_profile_data['mobile'] or user_profile_data['email']:
+                updated_user = app_user_mst.objects.filter(
+                    user_name=user_name).update(user_name=user_profile_data['user_name'], mobile=user_profile_data['mobile'], email=user_profile_data['email'])
 
-            if updated_user and user_link_profile and user_profile_update:
+            # print(user_profile_data['image'])
+            if user_profile_data['image'] or user_profile_data['description']:
+                # Save the image to the media directory
+                # new_image = request.FILES['image']
+                # # Save the image to the media directory
+                # default_storage.save(
+                #     'images/' + new_image.name, new_image)
+
+                user_profile_update = UserProfile.objects.get(
+                    user_name=user_name)
+                if user_profile_data['image']:
+                    user_profile_update.image = user_profile_data['image']
+                else:
+                    user_profile_update.description = user_profile_data['description']
+
+                user_profile_update.save()
+
+            if user_profile_data['user_name'] is not None:
+                user_link_profile = LinkProfile.objects.filter(
+                    user_name=user_name).update(user_name=user_profile_data['user_name'])
+
+            if updated_user or user_link_profile or user_profile_update:
                 messages.success(request, 'User Profile updated successfully')
             else:
                 messages.error(request, "Error in model updation")
 
         # adding link logic
-        elif 'add-link' in request.POST:
+        elif 'add_link' in request.POST:
             user_link_data = {
                 'channel_link': request.POST.get('channel'),
                 'personal_link': request.POST.get('link')
@@ -126,15 +150,17 @@ def HomePage(request):
 
             link_user_data = LinkProfile.objects.filter(user_name=user_name)
 
-            for i in link_user_data.length:
-                if link_user_data[i].channel_url == user_link_data.channel_link:
+            for i in link_user_data:
+                if i.channel_url == user_link_data.channel_link:
                     messages.error(request, "Channle link alreay exits.")
                     return redirect('home-page')
 
             # add_Link = LinkProfile.objects.filter(user_name=user_name).update(
             #     channel_url=user_link_data.channel_link, personal_url=user_link_data.personal_link)            # adding the link of channel and personal
             LinkProfile.objects.create(
-                user_name=user_name, channel_url=user_link_data.channel_link, personal_url=user_link_data.personal_link)
+                user_name=user_name, channel_url=user_link_data[
+                    'channel_link'], personal_url=user_link_data['personal_link']
+            )
 
         return redirect('home-page')
     context = {
