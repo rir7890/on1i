@@ -1,6 +1,8 @@
 from django.db import models
 # from django.utils import timezone
 
+# information about user is in app_user_mst
+
 
 class app_user_mst(models.Model):
     user_name = models.CharField(max_length=100, primary_key=True)
@@ -14,6 +16,8 @@ class app_user_mst(models.Model):
 
     def __str__(self):
         return f'{self.user_name}'
+
+# user profile is generated for images and description
 
 
 class UserProfile(models.Model):
@@ -29,6 +33,8 @@ class UserProfile(models.Model):
     def __str__(self):
         return f'{self.user_name} '
 
+
+# Link Profile is generated for channel url and personal url
 
 class LinkProfile(models.Model):
     user_name = models.CharField(max_length=100)

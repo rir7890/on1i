@@ -1,125 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      h1 {
-        color: #333;
-      }
-      form {
-        margin: 20px 0;
-      }
-      input[type="file"] {
-        display: block;
-        margin: 10px 0;
-      }
-      input[type="text"],
-      input[type="url"] {
-        display: block;
-        margin: 10px 0;
-        padding: 8px;
-        width: 300px;
-      }
-      button {
-        padding: 10px 15px;
-        background-color: #5cb85c;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #4cae4c;
-      }
-      .custom-text-field {
-        width: 400px;
-        height: 100px;
-        padding: 8px;
-      }
-    </style>
-  </head>
-  <body>
-    {% if user_name %}
-    <a href="{% url 'logout' %}">Logout</a>
-    {% endif %}
+{% extends "users/base.html" %} {% load static %} {% block title %}
+<title>Document</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  h1 {
+    color: #333;
+  }
+  form {
+    margin: 20px 0;
+  }
+  input[type="file"] {
+    display: block;
+    margin: 10px 0;
+  }
+  input[type="text"],
+  input[type="url"] {
+    display: block;
+    margin: 10px 0;
+    padding: 8px;
+    width: 300px;
+  }
+  button {
+    padding: 10px 15px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #357935;
+  }
+  .custom-text-field {
+    width: 400px;
+    height: 100px;
+    padding: 8px;
+  }
+</style>
+{% endblock title %} {% block content %}
+<body>
+  <!--this will be only shown when user is logged in-->
+  {% if user_name %}
+  <div>
+    <li>
+      <a href="{% url 'logout' %}">Logout</a>
+    </li>
+    <li>
+      <a href="{% url 'link-view' %}">Link Page</a>
+    </li>
+  </div>
+  {% endif %}
 
-    <h1>Upload Image</h1>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
+  {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+      {% endif %}
 
-      <img
-        src="{{user_image}}"
-        style="width: 200px; height: 200px; border-radius: 50%"
-        alt="userImage"
-      />
-      <br />
-      <label for="id_image">Image:</label>
+  <!--this is form for user profile update-->
+  <h1>Profile</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 
-      <input type="file" name="image" id="id_image" />
+    <img
+      src="{{user_image}}"
+      style="width: 200px; height: 200px; border-radius: 50%"
+      alt="userImage"
+    />
+    <br />
 
-      <input
-        type="text"
-        name="user_name"
-        id=""
-        placeholder="{{user_name}}"
-        value="{{user_name}}"
-      />
+    <input type="file" name="image" id="id_image" />
 
-      <textarea
-        type="text"
-        name="description"
-        id=""
-        placeholder="{{description}}"
-        class="custom-text-field"
-      >
+    <input
+      type="text"
+      name="user_name"
+      placeholder="{{user_name}}"
+      value="{{user_name}}"
+    />
+
+    <textarea
+      type="text"
+      name="description"
+      placeholder="{{description}}"
+      class="custom-text-field"
+    >
 {{description}}</textarea
-      >
+    >
 
-      <input
-        type="text"
-        name="mobile"
-        id=""
-        placeholder="{{mobile}}"
-        value="{{mobile}}"
-      />
+    <input
+      type="text"
+      name="mobile"
+      placeholder="{{mobile}}"
+      value="{{mobile}}"
+    />
 
-      <input
-        type="text"
-        name="email"
-        id=""
-        placeholder="{{email}}"
-        value="{{email}}"
-      />
+    <input type="text" name="email" placeholder="{{email}}" value="{{email}}" />
+    <button type="submit" name="upload_profile">Update Profile</button>
+  </form>
 
-      <button type="submit" name="upload_profile">Update Profile</button>
-    </form>
+  <!-- this form is used to take the channel and profile link of the user-->
+  <form method="post">
+    {% csrf_token %}
+    <label for="channel">Social Media Channel:</label>
+    <input
+      type="text"
+      name="channel"
+      id="channel"
+      required
+      placeholder="Add channel link.."
+    />
 
-    <form method="post">
-      {% csrf_token %}
-      <label for="channel">Social Media Channel:</label>
-      <input
-        type="text"
-        name="channel"
-        id="channel"
-        required
-        placeholder="Add channel link.."
-      />
-
-      <label for="link">Link:</label>
-      <input
-        type="text"
-        name="link"
-        id="link"
-        required
-        placeholder="Add userlink after channel..."
-      />
-
-      <button type="submit" name="add_link">Add</button>
-    </form>
-  </body>
-</html>
+    <label for="link">Link:</label>
+    <input
+      type="text"
+      name="link"
+      id="link"
+      required
+      placeholder="Add userlink after channel..."
+    />
+    <button type="submit" name="add_link">Add</button>
+  </form>
+</body>
+{% endblock content %}

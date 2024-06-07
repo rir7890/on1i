@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from .models import app_user_mst, UserProfile, LinkProfile
 from django.contrib import messages
-from django.conf import settings
-
+# from django.conf import settings
 # from django.contrib.auth import login
 
 
@@ -16,6 +15,7 @@ def SignUp(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirmPassword = request.POST.get('confirm-password')
+
         if not user_name or not f_name or not l_name or not mobile or not email or not password:
             messages.error(
                 request, 'Check all the data correctly don\'t enter empty values')
@@ -34,26 +34,31 @@ def SignUp(request):
                                    l_name=l_name, password=password, mobile=mobile, email=email)
             newuser.save()
         except Exception as e:
-            print("error in saving new user: " + e.message)
+            print("error in saving new user: " + str(e))
             messages.error(request, "Value Error in Registration Form")
             return redirect('signup')
+
         messages.success(request, 'User created successfully')
         return redirect('signin')
+
     else:
         return render(request, 'users/signup.html')
 
 
 def SignIn(request):
+
     if request.method == 'POST':
+
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
         if not user_name or not password:
             messages.error(request, 'missing or Invalid username or password')
             return redirect('signin')
+
         try:
             registered_user = app_user_mst.objects.get(user_name=user_name)
         except Exception as e:
-            print("error in saving new user.")
+            print("error in saving new user."+str(e))
             messages.error(request, 'Error in the Server from the Backend.')
             return redirect('signin')
 
@@ -64,6 +69,7 @@ def SignIn(request):
         else:
             messages.error(request, 'User is not registered.')
             return redirect('signup')
+
     return render(request, 'users/signin.html')
 
 
@@ -74,9 +80,16 @@ def Home(request):
 
 # after user login this page will be showned
 def HomePage(request):
+
     user_name = request.session.get('user_name')
-    user_info = app_user_mst.objects.get(user_name=user_name)
-    user_profile = UserProfile.objects.get(user_name=user_name)
+
+    try:
+        user_info = app_user_mst.objects.get(user_name=user_name)
+        user_profile = UserProfile.objects.get(user_name=user_name)
+    except Exception as e:
+        print("Couldn't find user information:"+str(e))
+        messages.error(request, "Couldn't find user information.")
+        return redirect('signin')
 
     # print(user_profile.image.url)
 
@@ -92,9 +105,9 @@ def HomePage(request):
         return redirect('signin')
 
     if request.method == 'POST':
-
         # uploading file logic
         if 'upload_profile' in request.POST:
+
             user_profile_data = {
                 'image': request.FILES.get('image', user_profile.image),
                 'user_name': request.POST.get('username', user_name),
@@ -103,66 +116,88 @@ def HomePage(request):
                 'email': request.POST.get('email', user_info.email),
             }
 
-            # check if the user is already exists or not
-            # if app_user_mst.objects.filter(user_name=user_profile_data['user_name']).exists():
-            #     messages.error(
-            #         request, 'username already exists , please taken another username')
-            #     return redirect('home-page')
-
-            # update the user profile data after updating the profile
-            # print(user_profile_data['user_name'])
             if user_profile_data['user_name'] or user_profile_data['mobile'] or user_profile_data['email']:
-                updated_user = app_user_mst.objects.filter(
-                    user_name=user_name).update(user_name=user_profile_data['user_name'], mobile=user_profile_data['mobile'], email=user_profile_data['email'])
+                updated_user = app_user_mst.objects.get(user_name=user_name)
+                updated_user.user_name = user_profile_data['user_name']
+                updated_user.mobile = user_profile_data['mobile']
+                updated_user.email = user_profile_data['email']
+                updated_user.save()
 
             # print(user_profile_data['image'])
             if user_profile_data['image'] or user_profile_data['description']:
-                # Save the image to the media directory
-                # new_image = request.FILES['image']
-                # # Save the image to the media directory
-                # default_storage.save(
-                #     'images/' + new_image.name, new_image)
+                try:
+                    user_profile_update = UserProfile.objects.get(
+                        user_name=user_name)
+                except Exception as e:
+                    print("Error in getting user profile for update.")
+                    messages.error(
+                        request, "Could not get user profile for update.")
+                    return redirect('home-page')
 
-                user_profile_update = UserProfile.objects.get(
-                    user_name=user_name)
                 if user_profile_data['image']:
                     user_profile_update.image = user_profile_data['image']
-                else:
+
+                if user_profile_data['description']:
                     user_profile_update.description = user_profile_data['description']
 
                 user_profile_update.save()
 
             if user_profile_data['user_name'] is not None:
-                user_link_profile = LinkProfile.objects.filter(
-                    user_name=user_name).update(user_name=user_profile_data['user_name'])
+
+                try:
+                    user_link_profile = LinkProfile.objects.get(
+                        user_name=user_name)
+                    user_link_profile['user_name'] = user_profile_data['user_name']
+                    user_link_profile.save()
+                except Exception as e:
+                    print("Error in updating link profile username: " + str(e))
+                    messages.error(
+                        request, "Error in updating link profile username.")
+                    return redirect('home-page')
 
             if updated_user or user_link_profile or user_profile_update:
+
                 messages.success(request, 'User Profile updated successfully')
             else:
                 messages.error(request, "Error in model updation")
 
         # adding link logic
         elif 'add_link' in request.POST:
+
             user_link_data = {
                 'channel_link': request.POST.get('channel'),
                 'personal_link': request.POST.get('link')
             }
 
-            link_user_data = LinkProfile.objects.filter(user_name=user_name)
+            if not user_link_data['channel_link'] and not user_link_data['personal_link']:
+                messages.error(
+                    request, "Provide channel and personal user url correctly")
+                return redirect('home-page')
+
+            try:
+                link_user_data = LinkProfile.objects.filter(
+                    user_name=user_name)
+            except Exception as e:
+                print("Error in filter the link profile: " + str(e))
+                messages.error(request, "Error in filter the link profile.")
+                return redirect('home-page')
 
             for i in link_user_data:
-                if i.channel_url == user_link_data.channel_link:
-                    messages.error(request, "Channle link alreay exits.")
+                if i.channel_url == user_link_data['channel_link']:
+                    messages.error(request, "Channel link already exits.")
                     return redirect('home-page')
 
-            # add_Link = LinkProfile.objects.filter(user_name=user_name).update(
-            #     channel_url=user_link_data.channel_link, personal_url=user_link_data.personal_link)            # adding the link of channel and personal
-            LinkProfile.objects.create(
-                user_name=user_name, channel_url=user_link_data[
-                    'channel_link'], personal_url=user_link_data['personal_link']
-            )
+           # adding the link of channel and personal
+            try:
+                LinkProfile.objects.create(
+                    user_name=user_name, channel_url=user_link_data['channel_link'], personal_url=user_link_data['personal_link'])
+            except Exception as e:
+                print("Error creating link profile: " + e)
+                messages.error(request, "Could not create link profile")
+                return redirect('home-page')
 
         return redirect('home-page')
+
     context = {
         'user_name': user_name,
         'email': user_info.email,
@@ -170,10 +205,32 @@ def HomePage(request):
         'description': user_profile.description,
         'user_image': user_profile.image.url
     }
+
     return render(request, 'users/home_page.html', context)
 
 
 def logout_view(request):
+
     request.session.flush()
     messages.success(request, 'User have been successfully logged out')
     return redirect('signin')
+
+
+def linked_view(request):
+    user_name = request.session.get('user_name')
+    if not user_name:
+        messages.error(request, "request denied to access Link Page.")
+        return redirect('signin')
+
+    try:
+        data = LinkProfile.objects.filter(user_name=user_name)
+    except Exception as e:
+        print("Error in getting linked profile using Filter"+str(e))
+        messages.error(request, "Could not get linked profile data.")
+        return redirect('home-page')
+
+    context = {
+        'linked_data': data
+    }
+
+    return render(request, 'users/linked_page.html', context)

@@ -1,19 +1,14 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
-    <title>Home Page</title>
-  </head>
-  <body>
-    <div class="home-container">
-      <img src="{% static 'images/logo.png' %}" alt="logo image" />
-      <div class="home-link-contain">
-        <a class="btn" href="{% url 'signin' %}">Sign In</a>
-        <a class="btn" href="{% url 'signup' %}"> Sign Up</a>
-      </div>
+{% extends "users/base.html" %} {% load static %} {% block title %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
+<title>On1i</title>
+{% endblock title %} {% block content %}
+<body>
+  <div class="home-container">
+    <img src="{% static 'images/logo.png' %}" alt="logo image" />
+    <div class="home-link-contain">
+      <a class="btn" href="{% url 'signin' %}">Sign In</a>
+      <a class="btn" href="{% url 'signup' %}"> Sign Up</a>
     </div>
-  </body>
-</html>
+  </div>
+</body>
+{% endblock content %}

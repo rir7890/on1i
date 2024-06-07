@@ -1,0 +1,16 @@
+{% extends "users/base.html" %} {% load static %} {% block title %}
+<title>Link Page</title>
+{% endblock title %} {% block content %}
+<body>
+  <!-- this div box contain the link box to with which we have shown the url link  -->
+  <div class="">
+    {% for item in linked_data %}
+    <li>
+      <a href="{{item.channel_url}}/{{item.personal_url}}"
+        >{{item.channel_url}}/{{item.personal_url}}</a
+      >
+    </li>
+    {% endfor %}
+  </div>
+</body>
+{% endblock content %}
