@@ -1,0 +1,34 @@
+body{
+    background-color: #84DCCF;
+}
+
+#link-container{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+a{
+    text-decoration: none !important;
+}
+
+.link-box{
+    list-style-type: none !important;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin-left:20px;
+    padding-top:20px;
+}
+
+.nav-item:hover{
+    background-color: grey;
+}
+
+#ftr{
+    display: inline-block;
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+}

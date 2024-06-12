@@ -38,7 +38,7 @@ class UserProfile(models.Model):
 
 class LinkProfile(models.Model):
     user_name = models.CharField(max_length=100)
-    channel_url = models.URLField(blank=True)
+    channel_url = models.CharField(max_length=100)
     personal_url = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

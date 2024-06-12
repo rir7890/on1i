@@ -1,0 +1,40 @@
+body{
+    background-color: #84DCCF;
+}
+.signup-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      background-color: #90e0d3;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .logo-img {
+      max-width: 180px;
+      margin-bottom: 20px;
+    }
+    .input-field {
+      margin-bottom: 20px;
+    }
+    .form-control {
+      text-align: center;
+    }
+    .btn-signup {
+      width: 100%;
+    }
+    .messages {
+      list-style-type: none;
+      padding: 0;
+      margin-bottom: 20px;
+    }
+    .messages li {
+      color: red; /* Customize based on message type */
+    }
+    .signup-button {
+      margin-top: 20px;
+    }
+    .signup-button span {
+      display: block;
+      margin-bottom: 10px;
+    }

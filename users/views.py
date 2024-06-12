@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from .models import app_user_mst, UserProfile, LinkProfile
 from django.contrib import messages
+from .constants import ICON_MAP
+from on1i.settings import MEDIA_ROOT
 # from django.conf import settings
 # from django.contrib.auth import login
 
@@ -209,6 +211,7 @@ def HomePage(request):
     return render(request, 'users/home_page.html', context)
 
 
+# logout working
 def logout_view(request):
 
     request.session.flush()
@@ -216,6 +219,7 @@ def logout_view(request):
     return redirect('signin')
 
 
+# linked page code
 def linked_view(request):
     user_name = request.session.get('user_name')
     if not user_name:
@@ -229,8 +233,16 @@ def linked_view(request):
         messages.error(request, "Could not get linked profile data.")
         return redirect('home-page')
 
+    channel_data = {}
+    for x in data:
+        channel_data[x.channel_url] = {
+            'channel_icon': ICON_MAP.get(x.channel_url, 'channel/default-icon.png'),
+            'personal_url': x.personal_url
+        }
+
     context = {
-        'linked_data': data
+        'linked_data': channel_data,
+        'user_name': user_name,
     }
 
     return render(request, 'users/linked_page.html', context)

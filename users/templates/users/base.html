@@ -9,7 +9,25 @@
       type="image/x-icon"
       href="{% static 'images/favicon.ico' %}"
     />
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Signika:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow&display=swap"
+      rel="stylesheet"
+    />
     {% block title %} {% endblock %}
   </head>
-  {% block content %} {% endblock %}
+
+  <body>
+    {% block content %} {% endblock %}
+  </body>
 </html>

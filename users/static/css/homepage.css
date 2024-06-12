@@ -1,0 +1,70 @@
+body{
+    background-color: #84DCCF;
+}
+
+.navbar-custom {
+    background-color: #262626; /* Black background */
+}
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+      color: #fff;
+    }
+
+.navbar-custom .nav-link:hover {
+      color: #d3d3d3; /* Light grey text on hover */
+    }  
+
+
+.containerr {
+      max-width: 600px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+    .edit-headline {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .btn-upload {
+      background-color: #007bff;
+      color: white;
+      margin-bottom: 20px;
+    }
+    .btn-add {
+      width: 100%;
+      background-color: #343a40;
+      color: white;
+    }
+    .custom-file-input::before {
+      content: 'Upload Image';
+      display: inline-block;
+      background: #007bff;
+      border: 1px solid #007bff;
+      border-radius: 3px;
+      padding: 5px 8px;
+      outline: none;
+      white-space: nowrap;
+      cursor: pointer;
+      color: white;
+      text-shadow: 1px 1px rgba(0, 0, 0, 0.1);
+      font-weight: 700;
+      font-size: 10pt;
+    }
+
+    a.nav-link:hover{
+    background-color: grey;
+}
+
+
+#ftr{
+    display: inline-block;
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+}
