@@ -1,14 +1,19 @@
 from django.shortcuts import render, redirect
-from django.core.files.storage import default_storage
+# from django.core.files.storage import default_storage
 from .models import app_user_mst, UserProfile, LinkProfile
+from .encryption import encrypt_user_name, decrypt_user_name
 from django.contrib import messages
 from .constants import ICON_MAP
-from on1i.settings import MEDIA_ROOT
+# from .crypto import encrypt, decrypt
 # from django.conf import settings
 # from django.contrib.auth import login
 
 
 def SignUp(request):
+
+    if request.session.get('user_name'):
+        return redirect('home-page')
+
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         f_name = request.POST.get('f_name')
@@ -48,6 +53,9 @@ def SignUp(request):
 
 
 def SignIn(request):
+
+    if request.session.get('user_name'):
+        return redirect('home-page')
 
     if request.method == 'POST':
 
@@ -221,6 +229,7 @@ def logout_view(request):
 
 # linked page code
 def linked_view(request):
+
     user_name = request.session.get('user_name')
     if not user_name:
         messages.error(request, "request denied to access Link Page.")
@@ -240,9 +249,40 @@ def linked_view(request):
             'personal_url': x.personal_url
         }
 
+    encrypted_user_name = encrypt_user_name(user_name)
+
     context = {
         'linked_data': channel_data,
         'user_name': user_name,
+        'encrypted_user_name': encrypted_user_name
     }
 
     return render(request, 'users/linked_page.html', context)
+
+
+def public_link(request, encrypted_user_name):
+
+    user_name = decrypt_user_name(encrypted_user_name)
+    if not user_name:
+        messages.error(request, "Invalid link.")
+        return redirect('home')
+
+    try:
+        data = LinkProfile.objects.filter(user_name=user_name)
+    except Exception as e:
+        print("Error in getting linked profile using Filter"+str(e))
+        messages.error(request, "Could not get linked profile data.")
+        return redirect('home')
+
+    channel_data = {}
+    for x in data:
+        channel_data[x.channel_url] = {
+            'channel_icon': ICON_MAP.get(x.channel_url, 'channel/default-icon.png'),
+            'personal_url': x.personal_url
+        }
+
+    context = {
+        'linked_data': channel_data,
+    }
+
+    return render(request, 'users/public_link.html', context)
