@@ -8,6 +8,6 @@ urlpatterns = [
     path('home-page/', HomePage, name="home-page"),
     path('logout/', logout_view, name='logout'),
     path('linked-view/', linked_view, name="link-view"),
-    path('public-link/<str:encrypted_user_name>/',
+    path('public-link/<str:user_name>/',
          public_link, name="public-link"),
 ]

@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
-# from django.core.files.storage import default_storage
 from .models import app_user_mst, UserProfile, LinkProfile
-from .encryption import encrypt_user_name, decrypt_user_name
+# from .encryption import encrypt_user_name, decrypt_user_name
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
 from .constants import ICON_MAP
-# from .crypto import encrypt, decrypt
 # from django.conf import settings
 # from django.contrib.auth import login
 
@@ -13,74 +12,81 @@ def SignUp(request):
 
     if request.session.get('user_name'):
         return redirect('home-page')
+    else:
 
-    if request.method == 'POST':
-        user_name = request.POST.get('user_name')
-        f_name = request.POST.get('f_name')
-        l_name = request.POST.get('l_name')
-        mobile = request.POST.get('mobile')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        confirmPassword = request.POST.get('confirm-password')
+        if request.method == 'POST':
+            user_name = request.POST.get('user_name')
+            f_name = request.POST.get('f_name')
+            l_name = request.POST.get('l_name')
+            mobile = request.POST.get('mobile')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            confirmPassword = request.POST.get('confirm-password')
 
-        if not user_name or not f_name or not l_name or not mobile or not email or not password:
-            messages.error(
-                request, 'Check all the data correctly don\'t enter empty values')
-            return redirect('signup')
+            if not user_name or not f_name or not l_name or not mobile or not email or not password:
+                messages.error(
+                    request, 'Check all the data correctly don\'t enter empty values')
+                return redirect('signup')
 
-        if password != confirmPassword:
-            messages.error(request, 'Password mismatch')
-            return redirect('signup')
+            if password != confirmPassword:
+                messages.error(request, 'Password mismatch')
+                return redirect('signup')
 
-        if app_user_mst.objects.filter(user_name=user_name).exists():
-            messages.error(request, 'Username is already taken')
+            if app_user_mst.objects.filter(user_name=user_name).exists():
+                messages.error(request, 'Username is already taken')
+                return redirect('signin')
+
+            try:
+                hashed_password = make_password(password)
+                newuser = app_user_mst(user_name=user_name, f_name=f_name,
+                                       l_name=l_name, password=hashed_password, mobile=mobile, email=email)
+                user_profile_new = UserProfile(user_name=user_name)
+                user_profile_new.save()
+                newuser.save()
+            except Exception as e:
+                print("error in saving new user: " + str(e))
+                messages.error(request, "Value Error in Registration Form")
+                return redirect('signup')
+
+            messages.success(request, 'User created successfully')
             return redirect('signin')
 
-        try:
-            newuser = app_user_mst(user_name=user_name, f_name=f_name,
-                                   l_name=l_name, password=password, mobile=mobile, email=email)
-            newuser.save()
-        except Exception as e:
-            print("error in saving new user: " + str(e))
-            messages.error(request, "Value Error in Registration Form")
-            return redirect('signup')
-
-        messages.success(request, 'User created successfully')
-        return redirect('signin')
-
-    else:
-        return render(request, 'users/signup.html')
+        else:
+            return render(request, 'users/signup.html')
 
 
 def SignIn(request):
 
     if request.session.get('user_name'):
         return redirect('home-page')
+    else:
 
-    if request.method == 'POST':
+        if request.method == 'POST':
 
-        user_name = request.POST.get('user_name')
-        password = request.POST.get('password')
-        if not user_name or not password:
-            messages.error(request, 'missing or Invalid username or password')
-            return redirect('signin')
+            user_name = request.POST.get('user_name')
+            password = request.POST.get('password')
+            if not user_name or not password:
+                messages.error(
+                    request, 'missing or Invalid username or password')
+                return redirect('signin')
 
-        try:
-            registered_user = app_user_mst.objects.get(user_name=user_name)
-        except Exception as e:
-            print("error in saving new user."+str(e))
-            messages.error(request, 'Error in the Server from the Backend.')
-            return redirect('signin')
+            try:
+                registered_user = app_user_mst.objects.get(user_name=user_name)
+            except Exception as e:
+                print("error in saving new user."+str(e))
+                messages.error(
+                    request, 'Error in the Server from the Backend.')
+                return redirect('signin')
 
-        if registered_user and registered_user.password == password:
-            request.session['user_name'] = registered_user.user_name
-            messages.success(request, 'User Login Successfully')
-            return redirect('home-page')
-        else:
-            messages.error(request, 'User is not registered.')
-            return redirect('signup')
+            if registered_user and check_password(password, registered_user.password):
+                request.session['user_name'] = registered_user.user_name
+                messages.success(request, 'User Login Successfully')
+                return redirect('home-page')
+            else:
+                messages.error(request, 'User is not registered.')
+                return redirect('signup')
 
-    return render(request, 'users/signin.html')
+        return render(request, 'users/signin.html')
 
 
 # this page is only visible when website is opened
@@ -92,7 +98,6 @@ def Home(request):
 def HomePage(request):
 
     user_name = request.session.get('user_name')
-
     try:
         user_info = app_user_mst.objects.get(user_name=user_name)
         user_profile = UserProfile.objects.get(user_name=user_name)
@@ -249,20 +254,21 @@ def linked_view(request):
             'personal_url': x.personal_url
         }
 
-    encrypted_user_name = encrypt_user_name(user_name)
+    # encrypted_user_name = encrypt_user_name(user_name)
 
     context = {
         'linked_data': channel_data,
         'user_name': user_name,
-        'encrypted_user_name': encrypted_user_name
+        'copy_link': request.build_absolute_uri().replace('linked-view', 'public-link'),
+
     }
 
     return render(request, 'users/linked_page.html', context)
 
 
-def public_link(request, encrypted_user_name):
+def public_link(request, user_name):
 
-    user_name = decrypt_user_name(encrypted_user_name)
+    # user_name = decrypt_user_name(encrypted_user_name)
     if not user_name:
         messages.error(request, "Invalid link.")
         return redirect('home')
