@@ -4,8 +4,10 @@ from .models import app_user_mst, UserProfile, LinkProfile
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
 from .constants import ICON_MAP
+from validate_email import validate_email
 # from django.conf import settings
 # from django.contrib.auth import login
+import json
 
 
 def SignUp(request):
@@ -22,6 +24,12 @@ def SignUp(request):
             email = request.POST.get('email')
             password = request.POST.get('password')
             confirmPassword = request.POST.get('confirm-password')
+
+            # is_valid = validate_email(email, verify=True)
+
+            # if not is_valid:
+            #     messages.error(request, 'Email is not valid.')
+            #     return redirect('signup')
 
             if not user_name or not f_name or not l_name or not mobile or not email or not password:
                 messages.error(
@@ -41,10 +49,11 @@ def SignUp(request):
                 newuser = app_user_mst(user_name=user_name, f_name=f_name,
                                        l_name=l_name, password=hashed_password, mobile=mobile, email=email)
                 user_profile_new = UserProfile(user_name=user_name)
-                user_profile_new.save()
                 newuser.save()
+                user_profile_new.save()
             except Exception as e:
                 print("error in saving new user: " + str(e))
+                # print(e)
                 messages.error(request, "Value Error in Registration Form")
                 return redirect('signup')
 
@@ -78,6 +87,9 @@ def SignIn(request):
                     request, 'Error in the Server from the Backend.')
                 return redirect('signin')
 
+            if not user_name == UserProfile.objects.get(user_name=user_name).user_name:
+                return redirect('signup')
+
             if registered_user and check_password(password, registered_user.password):
                 request.session['user_name'] = registered_user.user_name
                 messages.success(request, 'User Login Successfully')
@@ -91,7 +103,10 @@ def SignIn(request):
 
 # this page is only visible when website is opened
 def Home(request):
-    return render(request, 'users/home.html')
+    if request.session.get('user_name'):
+        return redirect('home-page')
+    else:
+        return render(request, 'users/home.html')
 
 
 # after user login this page will be showned
@@ -157,15 +172,16 @@ def HomePage(request):
 
                 user_profile_update.save()
 
-            if user_profile_data['user_name'] is not None:
-
+            user_link_profile = LinkProfile.objects.filter(user_name=user_name)
+            if user_link_profile:
                 try:
-                    user_link_profile = LinkProfile.objects.get(
+                    user_link_profile = LinkProfile.objects.filter(
                         user_name=user_name)
                     user_link_profile['user_name'] = user_profile_data['user_name']
                     user_link_profile.save()
                 except Exception as e:
                     print("Error in updating link profile username: " + str(e))
+                    print(e)
                     messages.error(
                         request, "Error in updating link profile username.")
                     return redirect('home-page')
@@ -198,8 +214,8 @@ def HomePage(request):
                 return redirect('home-page')
 
             for i in link_user_data:
-                if i.channel_url == user_link_data['channel_link']:
-                    messages.error(request, "Channel link already exits.")
+                if i.personal_url == user_link_data['personal_link']:
+                    messages.error(request, "personal link already exits.")
                     return redirect('home-page')
 
            # adding the link of channel and personal
@@ -248,11 +264,15 @@ def linked_view(request):
         return redirect('home-page')
 
     channel_data = {}
+    i = 0
     for x in data:
-        channel_data[x.channel_url] = {
+        channel_data[i] = {
             'channel_icon': ICON_MAP.get(x.channel_url, 'channel/default-icon.png'),
-            'personal_url': x.personal_url
+            'personal_url': x.personal_url,
+            'profile_id': x.profile_id,
+            'channel_name': x.channel_url,
         }
+        i += 1
 
     # encrypted_user_name = encrypt_user_name(user_name)
 
@@ -268,27 +288,81 @@ def linked_view(request):
 
 def public_link(request, user_name):
 
-    # user_name = decrypt_user_name(encrypted_user_name)
+    if user_name == request.session.get('user_name'):
+        messages.error(request, 'User cannot access public page of itself')
+        return redirect('signin')
+
     if not user_name:
         messages.error(request, "Invalid link.")
         return redirect('home')
 
     try:
         data = LinkProfile.objects.filter(user_name=user_name)
+        print(data)
     except Exception as e:
         print("Error in getting linked profile using Filter"+str(e))
         messages.error(request, "Could not get linked profile data.")
         return redirect('home')
 
     channel_data = {}
+    i = 0
     for x in data:
-        channel_data[x.channel_url] = {
+        channel_data[i] = {
             'channel_icon': ICON_MAP.get(x.channel_url, 'channel/default-icon.png'),
-            'personal_url': x.personal_url
+            'channel_name': x.channel_url,
+            'personal_url': x.personal_url,
+            'profile_id': x.profile_id
         }
+        i += 1
 
+    print(channel_data)
     context = {
         'linked_data': channel_data,
     }
 
     return render(request, 'users/public_link.html', context)
+
+
+def track_click(request, profile_id):
+
+    if not profile_id:
+        messages.error(request, "Profile Id is not Valid")
+        return redirect('home')
+
+    try:
+        data = LinkProfile.objects.get(profile_id=profile_id)
+    except Exception as e:
+        print("Error in getting linked profile using Filter"+str(e))
+        messages.error(request, "Could not get linked profile data")
+        return redirect('home')
+
+    # print(data)
+    data.click_count += 1
+    data.save()
+
+    return redirect(data.personal_url)
+
+
+def DashBoardView(request):
+    user_name = request.session.get('user_name')
+
+    if not user_name:
+        messages.error(request, "Invalid link")
+        return redirect('home')
+
+    try:
+        data = LinkProfile.objects.filter(user_name=user_name)
+    except Exception as e:
+        print("Error in getting linked profile using Filter" + str(e))
+        messages.error(request, "Could not get linked profile data.")
+        return redirect('home')
+
+    label = [profile.channel_url for profile in data]
+    countData = [profile.click_count for profile in data]
+    # print(label, countData)
+    context = {
+        'labels': json.dumps(label),
+        'countData': json.dumps(countData),
+        'user_name': user_name
+    }
+    return render(request, 'users/dashboard.html', context)

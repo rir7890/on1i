@@ -5,14 +5,15 @@ body{
 .navbar-custom {
     background-color: #262626; /* Black background */
 }
-    .navbar-custom .navbar-brand,
+
+.navbar-custom .navbar-brand,
     .navbar-custom .nav-link {
       color: #fff;
-    }
+}
 
 .navbar-custom .nav-link:hover {
       color: #d3d3d3; /* Light grey text on hover */
-    }  
+}  
 
 
 .containerr {
@@ -41,7 +42,7 @@ body{
       background-color: #343a40;
       color: white;
     }
-    .custom-file-input::before {
+.custom-file-input::before {
       content: 'Upload Image';
       display: inline-block;
       background: #007bff;
@@ -55,12 +56,17 @@ body{
       text-shadow: 1px 1px rgba(0, 0, 0, 0.1);
       font-weight: 700;
       font-size: 10pt;
-    }
+}
 
-    a.nav-link:hover{
+a.nav-link:hover{
     background-color: grey;
 }
 
+.nav-link{
+    font-size: 22px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bolder;  
+}
 
 #ftr{
     display: inline-block;

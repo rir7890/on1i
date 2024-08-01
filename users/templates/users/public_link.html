@@ -26,7 +26,11 @@
     {% for item,value in linked_data.items %}
     <li class="link-box">
       <img src="{% static value.channel_icon %}" alt="image-icon" />
-      <a href="{{value.personal_url}}">{{item}}</a>
+      <a
+        href="{% url 'track-click' profile_id=value.profile_id %}"
+        target="_blank"
+        >{{item}}</a
+      >
     </li>
     {% endfor %}
   </div>

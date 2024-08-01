@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 # from django.utils import timezone
 
@@ -43,6 +44,9 @@ class LinkProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
+    profile_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
+    click_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.user_name}'
+        return f'{self.user_name} => {self.channel_url}'

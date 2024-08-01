@@ -5,7 +5,7 @@ ICON_MAP = {
     'youtube': 'channel/youtube-play-icon.png',
     'instagram': 'channel/instagram-icon.png',
     'snapchat': 'channel/snapchat-icon.png',
-    'twitter': 'channel/twitter-icon.png',
+    'twitter': 'channel/x-icon.png',
     'facebook': 'channel/facebook-icon.png',
     'linkedin': 'channel/linkedin-icon.png',
     'tiktok': 'channel/tik-tok-icon.png',
