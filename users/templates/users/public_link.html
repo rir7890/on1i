@@ -13,7 +13,7 @@
   <a class="navbar-brand pl-3" href="/"
     ><img
       class="bg-dark"
-      src="{% static 'images/logo.png' %}"
+      src="{% static 'images/logo-white.png' %}"
       style="width: 100px"
       alt="On1i image"
   /></a>
@@ -23,13 +23,13 @@
 <main class="container text-center my-4">
   <!-- Your main content goes here -->
   <div id="link-container">
-    {% for item,value in linked_data.items %}
+    {% for key,value in linked_data.items %}
     <li class="link-box">
       <img src="{% static value.channel_icon %}" alt="image-icon" />
       <a
         href="{% url 'track-click' profile_id=value.profile_id %}"
         target="_blank"
-        >{{item}}</a
+        >{{value.channel_name}}</a
       >
     </li>
     {% endfor %}
@@ -44,7 +44,7 @@
         <img src="https://img.icons8.com/fluency/36/000000/facebook-new.png" />
       </a>
       <a class="twitter" href="#">
-        <img src="https://img.icons8.com/fluency/36/000000/twitter.png" />
+        <img src="https://img.icons8.com/fluency/36/000000/twitterx.png" />
       </a>
       <a class="instagram" href=" https://www.instagram.com/on1iapp/">
         <img

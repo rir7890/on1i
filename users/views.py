@@ -1,12 +1,9 @@
 from django.shortcuts import render, redirect
 from .models import app_user_mst, UserProfile, LinkProfile
-# from .encryption import encrypt_user_name, decrypt_user_name
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
 from .constants import ICON_MAP
 from validate_email import validate_email
-# from django.conf import settings
-# from django.contrib.auth import login
 import json
 
 
@@ -195,15 +192,8 @@ def HomePage(request):
         # adding link logic
         elif 'add_link' in request.POST:
 
-            user_link_data = {
-                'channel_link': request.POST.get('channel'),
-                'personal_link': request.POST.get('link')
-            }
-
-            if not user_link_data['channel_link'] and not user_link_data['personal_link']:
-                messages.error(
-                    request, "Provide channel and personal user url correctly")
-                return redirect('home-page')
+            channels = request.POST.getlist('channel[]')
+            personals = request.POST.getlist('link[]')
 
             try:
                 link_user_data = LinkProfile.objects.filter(
@@ -213,19 +203,16 @@ def HomePage(request):
                 messages.error(request, "Error in filter the link profile.")
                 return redirect('home-page')
 
-            for i in link_user_data:
-                if i.personal_url == user_link_data['personal_link']:
-                    messages.error(request, "personal link already exits.")
+            for val in link_user_data:
+                if val.personal_url in personals:
+                    messages.error(
+                        request, "Please Enter the Unique url for the link.")
                     return redirect('home-page')
 
-           # adding the link of channel and personal
-            try:
-                LinkProfile.objects.create(
-                    user_name=user_name, channel_url=user_link_data['channel_link'], personal_url=user_link_data['personal_link'])
-            except Exception as e:
-                print("Error creating link profile: " + e)
-                messages.error(request, "Could not create link profile")
-                return redirect('home-page')
+            for channel, personal in zip(channels, personals):
+                if channel and personal:
+                    LinkProfile.objects.create(
+                        user_name=user_name, channel_url=channel, personal_url=personal)
 
         return redirect('home-page')
 
@@ -315,7 +302,7 @@ def public_link(request, user_name):
         }
         i += 1
 
-    print(channel_data)
+    # print(channel_data)
     context = {
         'linked_data': channel_data,
     }

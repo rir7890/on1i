@@ -16,7 +16,7 @@
   <a class="navbar-brand pl-3" href="/">
     <img
       class="bg-dark"
-      src="{% static 'images/logo.png' %}"
+      src="{% static 'images/logo-white.png' %}"
       style="width: 100px"
       alt="On1i image"
     />
@@ -33,27 +33,31 @@
     <span class="navbar-toggler-icon bg-secondary"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav ml-auto">
-      {% if user_name %}
-      <li class="nav-item pl-2 text-center">
-        <a class="nav-link text-white" href="{% url 'home-page' %}"
-          >Home Page</a
-        >
-      </li>
-      <li class="nav-item pl-2 text-center">
-        <a class="nav-link text-white" href="{% url 'link-view' %}"
-          >Link Page</a
-        >
-      </li>
-      <li class="nav-item pl-2 text-center">
-        <a class="nav-link text-white" href="{% url 'logout' %}">Logout</a>
-      </li>
-      {% endif %}
-    </ul>
+    <div class="d-flex flex-column w-100">
+      <ul id="navbar-align" class="navbar-nav ml-auto">
+        {% if user_name %}
+        <li class="nav-item pl-2 text-center">
+          <a class="nav-link text-white" href="{% url 'home-page' %}"
+            >Home Page</a
+          >
+        </li>
+        <li class="nav-item pl-2 text-center">
+          <a class="nav-link text-white" href="{% url 'link-view' %}"
+            >Link Page</a
+          >
+        </li>
+        <li class="nav-item pl-2 text-center">
+          <a class="nav-link text-white" href="{% url 'logout' %}">Logout</a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
   </div>
 </nav>
 
-<h1 class="text-center my-3">Dashboard - Doubtnut</h1>
+<h1 class="text-center my-3 fs-1 text-uppercase fw-bolder mb-5">
+  Dashboard - Doubtnut
+</h1>
 <div class="canvas-container mb-3">
   <canvas id="myChart" width="400" height="400"></canvas>
   <h1 id="view-error"></h1>
@@ -67,7 +71,7 @@
         <img src="https://img.icons8.com/fluency/36/000000/facebook-new.png" />
       </a>
       <a class="twitter" href=" https://www.facebook.com/on1iapp">
-        <img src="https://img.icons8.com/fluency/36/000000/twitter.png" />
+        <img src="https://img.icons8.com/fluency/36/000000/twitterx.png" />
       </a>
       <a class="instagram" href=" https://www.instagram.com/on1iapp/">
         <img

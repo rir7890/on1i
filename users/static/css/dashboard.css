@@ -39,3 +39,9 @@ a{
     width: 100%;
     bottom: 0px;
 }
+
+#navbar-align{
+    gap:20px;
+    display: flex;
+    justify-content: end;
+}
